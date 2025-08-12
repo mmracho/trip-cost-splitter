@@ -765,4 +765,344 @@
                         Download CSV Report
                     </button>
                     <button class="btn btn-secondary" onclick="exportToJSON()">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                        </svg>
+                        Save Trip Data
+                    </button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                        </svg>
+                        Load Trip Data
+                    </button>
+                    <input type="file" id="fileInput" class="file-input" accept=".json" onchange="importFromJSON(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let people = [];
+        let expenses = [];
+        let currentCurrency = 'JPY';
+        let currencySymbol = '¥';
+
+        // Currency mapping
+        const currencies = {
+            'JPY': { symbol: '¥', name: 'Japanese Yen' },
+            'USD': { symbol: ', name: 'US Dollar' },
+            'EUR': { symbol: '€', name: 'Euro' },
+            'GBP': { symbol: '£', name: 'British Pound' },
+            'CAD': { symbol: 'C, name: 'Canadian Dollar' },
+            'AUD': { symbol: 'A, name: 'Australian Dollar' },
+            'CNY': { symbol: '¥', name: 'Chinese Yuan' },
+            'KRW': { symbol: '₩', name: 'South Korean Won' },
+            'SGD': { symbol: 'S, name: 'Singapore Dollar' },
+            'HKD': { symbol: 'HK, name: 'Hong Kong Dollar' }
+        };
+
+        function updateCurrency() {
+            const select = document.getElementById('currencySelect');
+            currentCurrency = select.value;
+            currencySymbol = currencies[currentCurrency].symbol;
+            updateUI();
+        }
+
+        function formatCurrency(amount) {
+            if (currentCurrency === 'JPY' || currentCurrency === 'KRW') {
+                return `${currencySymbol}${Math.round(amount).toLocaleString()}`;
+            }
+            return `${currencySymbol}${amount.toFixed(2)}`;
+        }
+
+        function handlePersonKeyPress(event) {
+            if (event.key === 'Enter') {
+                addPerson();
+            }
+        }
+
+        function addPerson() {
+            const input = document.getElementById('personName');
+            const name = input.value.trim();
+            
+            if (name && !people.includes(name)) {
+                people.push(name);
+                input.value = '';
+                updateUI();
+            }
+        }
+
+        function removePerson(name) {
+            people = people.filter(person => person !== name);
+            expenses = expenses.filter(expense => expense.paidBy !== name);
+            updateUI();
+        }
+
+        function addExpense() {
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const paidBy = document.getElementById('expensePaidBy').value;
+
+            if (description && amount > 0 && paidBy) {
+                expenses.push({
+                    id: Date.now(),
+                    description,
+                    amount,
+                    paidBy,
+                    currency: currentCurrency,
+                    date: new Date().toLocaleDateString()
+                });
+
+                // Clear form
+                document.getElementById('expenseDescription').value = '';
+                document.getElementById('expenseAmount').value = '';
+                document.getElementById('expensePaidBy').value = '';
+
+                updateUI();
+            }
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(expense => expense.id !== id);
+            updateUI();
+        }
+
+        function updateUI() {
+            updatePeopleGrid();
+            updateExpensePaidBySelect();
+            updateExpenseTable();
+            updateSummary();
+            updateExportSection();
+        }
+
+        function updatePeopleGrid() {
+            const grid = document.getElementById('peopleGrid');
+            if (people.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        <div class="empty-title">No people added</div>
+                        <div class="empty-description">Add people who will be sharing expenses</div>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML = people.map(person => `
+                    <div class="person-card fade-in">
+                        <div class="person-name">${person}</div>
+                        <div class="person-actions">
+                            <button class="btn btn-danger" onclick="removePerson('${person}')" aria-label="Remove ${person}">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateExpensePaidBySelect() {
+            const select = document.getElementById('expensePaidBy');
+            select.innerHTML = '<option value="">Select person</option>' + 
+                people.map(person => `<option value="${person}">${person}</option>`).join('');
+        }
+
+        function updateExpenseTable() {
+            const container = document.getElementById('expenseTableContainer');
+            const tbody = document.getElementById('expenseTableBody');
+            const empty = document.getElementById('emptyExpenses');
+
+            if (expenses.length === 0) {
+                container.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            container.style.display = 'block';
+            empty.style.display = 'none';
+
+            tbody.innerHTML = expenses.map(expense => `
+                <tr class="fade-in">
+                    <td><strong>${expense.description}</strong></td>
+                    <td>${formatCurrency(expense.amount)}</td>
+                    <td>${expense.paidBy}</td>
+                    <td>${expense.date}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteExpense(${expense.id})" aria-label="Delete expense">
+                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateSummary() {
+            const section = document.getElementById('summarySection');
+            
+            if (people.length === 0 || expenses.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const perPerson = total / people.length;
+
+            document.getElementById('totalAmount').textContent = formatCurrency(total);
+            document.getElementById('peopleCount').textContent = people.length;
+            document.getElementById('perPersonAmount').textContent = formatCurrency(perPerson);
+
+            // Calculate balances
+            const balances = {};
+            people.forEach(person => {
+                const paid = expenses
+                    .filter(e => e.paidBy === person)
+                    .reduce((sum, e) => sum + e.amount, 0);
+                balances[person] = paid - perPerson;
+            });
+
+            const balanceList = document.getElementById('balanceList');
+            balanceList.innerHTML = people.map(person => {
+                const balance = balances[person];
+                const threshold = currentCurrency === 'JPY' || currentCurrency === 'KRW' ? 1 : 0.01;
+                const balanceClass = balance > threshold ? 'balance-positive' : 
+                                   balance < -threshold ? 'balance-negative' : 'balance-neutral';
+                const balanceText = Math.abs(balance) < threshold ? 'Settled' :
+                                   balance > 0 ? `Gets ${formatCurrency(Math.abs(balance))}` :
+                                   `Owes ${formatCurrency(Math.abs(balance))}`;
+
+                return `
+                    <div class="balance-item fade-in">
+                        <div class="balance-name">${person}</div>
+                        <div class="balance-amount ${balanceClass}">${balanceText}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateExportSection() {
+            const section = document.getElementById('exportSection');
+            section.style.display = (expenses.length > 0) ? 'block' : 'none';
+        }
+
+        function exportToCSV() {
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const perPerson = people.length > 0 ? total / people.length : 0;
+
+            // Calculate individual balances
+            const balances = {};
+            people.forEach(person => {
+                const paid = expenses
+                    .filter(e => e.paidBy === person)
+                    .reduce((sum, e) => sum + e.amount, 0);
+                balances[person] = paid - perPerson;
+            });
+
+            let csv = `EXPENSE SUMMARY - ${new Date().toLocaleDateString()}\n`;
+            csv += `Currency,${currentCurrency} (${currencies[currentCurrency].name})\n\n`;
+            csv += `Total Expenses,${total.toFixed(2)}\n`;
+            csv += `People Count,${people.length}\n`;
+            csv += `Per Person,${perPerson.toFixed(2)}\n\n`;
+
+            csv += 'INDIVIDUAL EXPENSES\n';
+            csv += 'Description,Amount,Paid By,Date,Currency\n';
+            expenses.forEach(expense => {
+                csv += `"${expense.description}",${expense.amount.toFixed(2)},"${expense.paidBy}","${expense.date}","${expense.currency || currentCurrency}"\n`;
+            });
+
+            csv += '\nSETTLEMENT DETAILS\n';
+            csv += 'Person,Amount Paid,Amount Owed,Balance,Status\n';
+            people.forEach(person => {
+                const paid = expenses
+                    .filter(e => e.paidBy === person)
+                    .reduce((sum, e) => sum + e.amount, 0);
+                const balance = balances[person];
+                const threshold = currentCurrency === 'JPY' || currentCurrency === 'KRW' ? 1 : 0.01;
+                const status = Math.abs(balance) < threshold ? 'Settled' :
+                              balance > 0 ? `Gets Back ${Math.abs(balance).toFixed(2)}` :
+                              `Owes ${Math.abs(balance).toFixed(2)}`;
+                
+                csv += `"${person}",${paid.toFixed(2)},${perPerson.toFixed(2)},${balance.toFixed(2)},"${status}"\n`;
+            });
+
+            downloadFile(csv, 'expense-report.csv', 'text/csv');
+        }
+
+        function exportToJSON() {
+            const data = {
+                people: people,
+                expenses: expenses,
+                currency: currentCurrency,
+                exportDate: new Date().toISOString(),
+                summary: {
+                    total: expenses.reduce((sum, expense) => sum + expense.amount, 0),
+                    perPerson: people.length > 0 ? expenses.reduce((sum, expense) => sum + expense.amount, 0) / people.length : 0
+                }
+            };
+
+            const json = JSON.stringify(data, null, 2);
+            downloadFile(json, `trip-expenses-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+        }
+
+        function importFromJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.people && data.expenses) {
+                        people = data.people;
+                        expenses = data.expenses;
+                        
+                        // Update currency if saved in file
+                        if (data.currency) {
+                            currentCurrency = data.currency;
+                            currencySymbol = currencies[currentCurrency].symbol;
+                            document.getElementById('currencySelect').value = currentCurrency;
+                        }
+                        
+                        updateUI();
+                        
+                        // Reset file input
+                        event.target.value = '';
+                        
+                        // Could add a success notification here
+                        console.log('Trip data loaded successfully!');
+                    } else {
+                        alert('Invalid file format. Please select a valid trip data file.');
+                    }
+                } catch (error) {
+                    alert('Error reading file. Please make sure it\'s a valid JSON file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        updateUI();
+    </script>
+</body>
+</html>
