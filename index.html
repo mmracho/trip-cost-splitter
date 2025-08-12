@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Splitter</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f23;
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .app {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #f1f5f9;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        input, select {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input::placeholder {
+            color: #64748b;
+        }
+
+        .input-flex {
+            flex: 1;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(148, 163, 184, 0.2);
+            box-shadow: none;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .people-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .person-card {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            gap: 0.5rem;
+        }
+
+        .person-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .remove-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            border-radius: 4px;
+            color: #f87171;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .expense-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .expense-table th {
+            background: rgba(102, 126, 234, 0.1);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .expense-table td {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 1rem;
+        }
+
+        .expense-table tr:hover {
+            background: rgba(148, 163, 184, 0.05);
+        }
+
+        .empty-state {
+            color: #64748b;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .stat-title {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-subtitle {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .balance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .balance-item {
+            align-items: center;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .balance-name {
+            font-weight: 500;
+        }
+
+        .balance-amount {
+            font-weight: 600;
+        }
+
+        .balance-positive {
+            color: #10b981;
+        }
+
+        .balance-negative {
+            color: #ef4444;
+        }
+
+        .balance-neutral {
+            color: #64748b;
+        }
+
+        .export-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            .app {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .expense-form {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .export-section {
+                flex-direction: column;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>Split</h1>
+            <p>Modern expense splitting made simple</p>
+        </header>
+
+        <!-- People Section -->
+        <div class="card glass-effect">
+            <h2 class="section-title">People</h2>
+            <div class="input-group">
+                <input type="text" id="personName" class="input-flex" placeholder="Add person..." onkeypress="handlePersonKeyPress(event)">
+                <button class="btn" onclick="addPerson()">Add</button>
+            </div>
+            <div class="people-grid" id="peopleGrid"></div>
+        </div>
+
+        <!-- Add Expense Section -->
+        <div class="card glass-effect">
+            <h2 class="section-title">Add Expense</h2>
+            <div class="expense-form">
+                <input type="text" id="expenseDescription" placeholder="What's this for?" class="input-flex">
+                <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" class="input-flex">
+                <select id="expensePaidBy" class="input-flex">
+                    <option value="">Who paid?</option>
+                </select>
+                <button class="btn" onclick="addExpense()">Add</button>
+            </div>
+        </div>
+
+        <!-- Expenses List -->
+        <div class="card glass-effect">
+            <h2 class="section-title">Expenses</h2>
+            <div id="expensesContainer">
+                <div class="empty-state" id="emptyExpenses">
+                    No expenses yet. Add your first expense above.
+                </div>
+                <table class="expense-table" id="expenseTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Paid by</th>
+                            <th>Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="card glass-effect" id="summarySection" style="display: none;">
+            <h2 class="section-title">Summary</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total Expenses</div>
+                    <div class="stat-value" id="totalAmount">$0.00</div>
+                    <div class="stat-subtitle">Split between <span id="peopleCount">0</span> people</div>
+                    <div class="stat-subtitle">$<span id="perPersonAmount">0.00</span> per person</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Settlement</div>
+                    <div class="balance-list" id="balanceList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="card glass-effect" id="exportSection" style="display: none;">
+            <h2 class="section-title">Save & Load</h2>
+            <div class="export-section">
+                <button class="btn" onclick="exportToCSV()">Download CSV</button>
+                <button class="btn btn-secondary" onclick="exportToJSON()">Save Trip Data</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Load Trip Data</button>
+                <input type="file" id="fileInput" class="file-input" accept=".json" onchange="importFromJSON(event)">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let people = [];
+        let expenses = [];
+
+        function handlePersonKeyPress(event) {
+            if (event.key === 'Enter') {
+                addPerson();
+            }
+        }
+
+        function addPerson() {
+            const input = document.getElementById('personName');
+            const name = input.value.trim();
+            
+            if (name && !people.includes(name)) {
+                people.push(name);
+                input.value = '';
+                updateUI();
+            }
+        }
+
+        function removePerson(name) {
+            people = people.filter(person => person !== name);
+            expenses = expenses.filter(expense => expense.paidBy !== name);
+            updateUI();
+        }
+
+        function addExpense() {
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const paidBy = document.getElementById('expensePaidBy').value;
+
+            if (description && amount > 0 && paidBy) {
+                expenses.push({
+                    id: Date.now(),
+                    description,
+                    amount,
+                    paidBy,
+                    date: new Date().toLocaleDateString()
+                });
+
+                // Clear form
+                document.getElementById('expenseDescription').value = '';
+                document.getElementById('expenseAmount').value = '';
+                document.getElementById('expensePaidBy').value = '';
+
+                updateUI();
+            }
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(expense => expense.id !== id);
+            updateUI();
+        }
+
+        function updateUI() {
+            updatePeopleGrid();
+            updateExpensePaidBySelect();
+            updateExpenseTable();
+            updateSummary();
+            updateExportSection();
+        }
+
+        function updatePeopleGrid() {
+            const grid = document.getElementById('peopleGrid');
+            grid.innerHTML = people.map(person => `
+                <div class="person-card fade-in">
+                    <div class="person-name">${person}</div>
+                    <button class="remove-btn" onclick="removePerson('${person}')">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function updateExpensePaidBySelect() {
+            const select = document.getElementById('expensePaidBy');
+            select.innerHTML = '<option value="">Who paid?</option>' + 
+                people.map(person => `<option value="${person}">${person}</option>`).join('');
+        }
+
+        function updateExpenseTable() {
+            const table = document.getElementById('expenseTable');
+            const tbody = document.getElementById('expenseTableBody');
+            const empty = document.getElementById('emptyExpenses');
+
+            if (expenses.length === 0) {
+                table.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'table';
+            empty.style.display = 'none';
+
+            tbody.innerHTML = expenses.map(expense => `
+                <tr class="fade-in">
+                    <td>${expense.description}</td>
+                    <td>$${expense.amount.toFixed(2)}</td>
+                    <td>${expense.paidBy}</td>
+                    <td>${expense.date}</td>
+                    <td>
+                        <button class="btn-danger" onclick="deleteExpense(${expense.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateSummary() {
+            const section = document.getElementById('summarySection');
+            
+            if (people.length === 0 || expenses.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const perPerson = total / people.length;
+
+            document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('peopleCount').textContent = people.length;
+            document.getElementById('perPersonAmount').textContent = perPerson.toFixed(2);
+
+            // Calculate balances
+            const balances = {};
+            people.forEach(person => {
+                const paid = expenses
+                    .filter(e => e.paidBy === person)
+                    .reduce((sum, e) => sum + e.amount, 0);
+                balances[person] = paid - perPerson;
+            });
+
+            const balanceList = document.getElementById('balanceList');
+            balanceList.innerHTML = people.map(person => {
+                const balance = balances[person];
+                const balanceClass = balance > 0.01 ? 'balance-positive' : 
+                                   balance < -0.01 ? 'balance-negative' : 'balance-neutral';
+                const balanceText = Math.abs(balance) < 0.01 ? 'Settled' :
+                                   balance > 0 ? `Gets $${balance.toFixed(2)}` :
+                                   `Owes $${Math.abs(balance).toFixed(2)}`;
+
+                return `
+                    <div class="balance-item fade-in">
+                        <div class="balance-name">${person}</div>
+                        <div class="balance-amount ${balanceClass}">${balanceText}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateExportSection() {
+            const section = document.getElementById('exportSection');
+            section.style.display = (expenses.length > 0) ? 'block' : 'none';
+        }
+
+        function exportToCSV() {
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const perPerson = people.length > 0 ? total / people.length : 0;
+
+            // Calculate individual balances
+            const balances = {};
+            people.forEach(person => {
+                const paid = expenses
+                    .filter(e => e.paidBy === person)
+                    .reduce((sum, e) => sum + e.amount, 0);
+                balances[person] = paid - perPerson;
+            });
+
+            let csv = 'EXPENSE SUMMARY\n\n';
+            csv += `Total Expenses,$${total.toFixed(2)}\n`;
+            csv += `People Count,${people.length}\n`;
+            csv += `Per Person,$${perPerson.toFixed(2)}\n\n`;
+
+            csv += 'INDIVIDUAL EXPENSES\n';
+            csv += 'Description,Amount,Paid By,Date\n';
+            expenses.forEach(expense => {
+                csv += `"${expense.description}",${expense.amount.toFixed(2)},"${expense.paidBy}","${expense.date}"\n`;
+            });
+
+            csv += '\nSETTLEMENT DETAILS\n';
+            csv += 'Person,Amount Paid,Amount Owed,Balance,Status\n';
+            people.forEach(person => {
+                const paid = expenses
+                    .filter(e => e.paidBy === person)
+                    .reduce((sum, e) => sum + e.amount, 0);
+                const balance = balances[person];
+                const status = Math.abs(balance) < 0.01 ? 'Settled' :
+                              balance > 0 ? `Gets Back $${balance.toFixed(2)}` :
+                              `Owes $${Math.abs(balance).toFixed(2)}`;
+                
+                csv += `"${person}",${paid.toFixed(2)},${perPerson.toFixed(2)},${balance.toFixed(2)},"${status}"\n`;
+            });
+
+            downloadFile(csv, 'expense-report.csv', 'text/csv');
+        }
+
+        function exportToJSON() {
+            const data = {
+                people: people,
+                expenses: expenses,
+                exportDate: new Date().toISOString(),
+                summary: {
+                    total: expenses.reduce((sum, expense) => sum + expense.amount, 0),
+                    perPerson: people.length > 0 ? expenses.reduce((sum, expense) => sum + expense.amount, 0) / people.length : 0
+                }
+            };
+
+            const json = JSON.stringify(data, null, 2);
+            downloadFile(json, 'trip-expenses.json', 'application/json');
+        }
+
+        function importFromJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.people && data.expenses) {
+                        people = data.people;
+                        expenses = data.expenses;
+                        updateUI();
+                        
+                        // Reset file input
+                        event.target.value = '';
+                        
+                        // Show success message (you could add a toast notification here)
+                        console.log('Trip data loaded successfully!');
+                    } else {
+                        alert('Invalid file format. Please select a valid trip data file.');
+                    }
+                } catch (error) {
+                    alert('Error reading file. Please make sure it\'s a valid JSON file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        updateUI();
+    </script>
+</body>
+</html>
