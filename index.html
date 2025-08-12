@@ -3,671 +3,766 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Splitter</title>
+    <title>Split - Modern Expense Tracker</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
+        :root {
+            /* Primary Colors */
+            --primary-600: #4F46E5;
+            --primary-500: #6366F1;
+            --primary-400: #818CF8;
+            --primary-50: #EEF2FF;
+            
+            /* Secondary Colors */
+            --secondary-600: #059669;
+            --secondary-500: #10B981;
+            --secondary-50: #ECFDF5;
+            
+            /* Neutral Colors */
+            --neutral-900: #111827;
+            --neutral-800: #1F2937;
+            --neutral-700: #374151;
+            --neutral-600: #4B5563;
+            --neutral-500: #6B7280;
+            --neutral-400: #9CA3AF;
+            --neutral-300: #D1D5DB;
+            --neutral-200: #E5E7EB;
+            --neutral-100: #F3F4F6;
+            --neutral-50: #F9FAFB;
+            --white: #FFFFFF;
+            
+            /* Status Colors */
+            --success-500: #10B981;
+            --success-50: #ECFDF5;
+            --error-500: #EF4444;
+            --error-50: #FEF2F2;
+            --warning-500: #F59E0B;
+            --warning-50: #FFFBEB;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0f0f23;
-            color: #e2e8f0;
-            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--primary-50) 100%);
+            color: var(--neutral-900);
             line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .app {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: var(--space-6) var(--space-4);
         }
 
+        /* Header */
         .header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: var(--space-12);
+            padding: var(--space-8) 0;
         }
 
-        .header h1 {
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-400));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-text {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 0.5rem;
         }
 
-        .header p {
-            color: #94a3b8;
-            font-size: 1.1rem;
+        .tagline {
+            color: var(--neutral-600);
+            font-size: 1.125rem;
+            font-weight: 400;
+            max-width: 480px;
+            margin: 0 auto;
         }
 
+        /* Cards */
         .card {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--neutral-200);
+            margin-bottom: var(--space-6);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .card:hover {
-            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: var(--shadow-xl);
             transform: translateY(-2px);
         }
 
-        .section-title {
-            font-size: 1.25rem;
+        .card-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--neutral-200);
+            background: linear-gradient(135deg, var(--neutral-50), var(--white));
+        }
+
+        .card-title {
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: #f1f5f9;
-        }
-
-        .input-group {
+            color: var(--neutral-900);
             display: flex;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            align-items: center;
+            gap: var(--space-3);
         }
 
-        input, select {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            color: #e2e8f0;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            outline: none;
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-500);
         }
 
-        input:focus, select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        .card-body {
+            padding: var(--space-6);
         }
 
-        input::placeholder {
-            color: #64748b;
+        /* Currency Selector */
+        .currency-selector {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+            padding: var(--space-4);
+            background: var(--primary-50);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--primary-200);
         }
 
-        .input-flex {
-            flex: 1;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.95rem;
+        .currency-selector label {
             font-weight: 500;
-            padding: 0.75rem 1.5rem;
-            transition: all 0.2s ease;
+            color: var(--primary-700);
             white-space: nowrap;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-row {
+            display: grid;
+            gap: var(--space-4);
+            align-items: end;
+        }
+
+        .form-row-2 {
+            grid-template-columns: 1fr auto;
+        }
+
+        .form-row-4 {
+            grid-template-columns: 2fr 1fr 1.5fr auto;
+        }
+
+        .label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--neutral-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .input, .select {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            border: 2px solid var(--neutral-200);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: var(--white);
+            color: var(--neutral-900);
+        }
+
+        .input:focus, .select:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px var(--primary-50);
+        }
+
+        .input::placeholder {
+            color: var(--neutral-400);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-5);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
         }
 
         .btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-700), var(--primary-600));
         }
 
         .btn-secondary {
-            background: rgba(148, 163, 184, 0.1);
-            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: var(--white);
+            color: var(--neutral-700);
+            border: 2px solid var(--neutral-200);
         }
 
         .btn-secondary:hover {
-            background: rgba(148, 163, 184, 0.2);
-            box-shadow: none;
+            background: var(--neutral-50);
+            border-color: var(--neutral-300);
         }
 
         .btn-danger {
-            background: #ef4444;
-            font-size: 0.8rem;
-            padding: 0.5rem 0.75rem;
+            background: var(--error-500);
+            color: var(--white);
+            padding: var(--space-2) var(--space-3);
+            font-size: 0.75rem;
         }
 
         .btn-danger:hover {
-            background: #dc2626;
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+            background: #DC2626;
         }
 
+        /* People Grid */
         .people-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 0.75rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--space-4);
         }
 
         .person-card {
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 8px;
-            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--primary-50), var(--white));
+            border: 2px solid var(--primary-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
             display: flex;
             align-items: center;
-            justify-content: between;
-            gap: 0.5rem;
-        }
-
-        .person-name {
-            flex: 1;
-            font-weight: 500;
-        }
-
-        .remove-btn {
-            background: rgba(239, 68, 68, 0.2);
-            border: none;
-            border-radius: 4px;
-            color: #f87171;
-            cursor: pointer;
-            font-size: 0.8rem;
-            padding: 0.25rem 0.5rem;
+            justify-content: space-between;
             transition: all 0.2s ease;
         }
 
-        .remove-btn:hover {
-            background: rgba(239, 68, 68, 0.3);
+        .person-card:hover {
+            border-color: var(--primary-400);
+            transform: translateY(-1px);
         }
 
-        .expense-form {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1.5fr auto;
-            gap: 1rem;
-            align-items: end;
+        .person-name {
+            font-weight: 500;
+            color: var(--neutral-900);
         }
 
-        .expense-table {
+        .person-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
         }
 
-        .expense-table th {
-            background: rgba(102, 126, 234, 0.1);
-            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-            color: #cbd5e1;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 1rem;
+        .table th {
+            background: linear-gradient(135deg, var(--neutral-50), var(--primary-50));
+            padding: var(--space-4);
             text-align: left;
+            font-weight: 600;
+            color: var(--neutral-700);
+            border-bottom: 2px solid var(--neutral-200);
         }
 
-        .expense-table td {
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-            padding: 1rem;
+        .table td {
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--neutral-200);
+            color: var(--neutral-900);
         }
 
-        .expense-table tr:hover {
-            background: rgba(148, 163, 184, 0.05);
+        .table tr:hover {
+            background: var(--neutral-50);
         }
 
-        .empty-state {
-            color: #64748b;
-            padding: 3rem;
-            text-align: center;
+        .table tr:last-child td {
+            border-bottom: none;
         }
 
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
         }
 
         .stat-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--white), var(--neutral-50));
+            border: 2px solid var(--neutral-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            padding: var(--space-2);
+            background: var(--primary-500);
+            border-radius: var(--radius-md);
+            color: var(--white);
         }
 
         .stat-title {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--neutral-900);
         }
 
         .stat-value {
-            color: #667eea;
-            font-size: 2rem;
+            font-size: 2.25rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            color: var(--primary-600);
+            margin-bottom: var(--space-2);
         }
 
         .stat-subtitle {
-            color: #64748b;
-            font-size: 0.85rem;
+            color: var(--neutral-600);
+            font-size: 0.875rem;
         }
 
+        /* Balance List */
         .balance-list {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: var(--space-3);
         }
 
         .balance-item {
-            align-items: center;
-            background: rgba(15, 23, 42, 0.3);
-            border-radius: 8px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            padding: 1rem;
+            padding: var(--space-4);
+            background: var(--white);
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .balance-item:hover {
+            background: var(--neutral-50);
         }
 
         .balance-name {
             font-weight: 500;
+            color: var(--neutral-900);
         }
 
         .balance-amount {
             font-weight: 600;
+            font-size: 0.875rem;
         }
 
         .balance-positive {
-            color: #10b981;
+            color: var(--success-500);
         }
 
         .balance-negative {
-            color: #ef4444;
+            color: var(--error-500);
         }
 
         .balance-neutral {
-            color: #64748b;
+            color: var(--neutral-500);
         }
 
-        .export-section {
+        /* Export Actions */
+        .export-actions {
             display: flex;
-            gap: 1rem;
+            flex-wrap: wrap;
+            gap: var(--space-4);
             justify-content: center;
-            margin-top: 2rem;
         }
 
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-12) var(--space-6);
+            color: var(--neutral-500);
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--space-4);
+            color: var(--neutral-300);
+        }
+
+        .empty-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--neutral-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .empty-description {
+            font-size: 1rem;
+            color: var(--neutral-500);
+        }
+
+        /* File Input */
         .file-input {
             display: none;
         }
 
-        .glass-effect {
-            backdrop-filter: blur(20px);
-            background: rgba(15, 23, 42, 0.8);
-        }
-
-        @media (max-width: 768px) {
-            .app {
-                padding: 1rem;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .card {
-                padding: 1.5rem;
-            }
-            
-            .expense-form {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-            }
-            
-            .input-group {
-                flex-direction: column;
-            }
-            
-            .export-section {
-                flex-direction: column;
-            }
-        }
-
+        /* Animations */
         .fade-in {
             animation: fadeIn 0.5s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app {
+                padding: var(--space-4) var(--space-3);
+            }
+
+            .logo-text {
+                font-size: 2rem;
+            }
+
+            .form-row-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .export-actions {
+                flex-direction: column;
+            }
+
+            .people-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .currency-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-body {
+                padding: var(--space-4);
+            }
+
+            .card-header {
+                padding: var(--space-4);
+            }
+
+            .stat-value {
+                font-size: 1.875rem;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styles for better accessibility */
+        .btn:focus-visible,
+        .input:focus-visible,
+        .select:focus-visible {
+            outline: 2px solid var(--primary-500);
+            outline-offset: 2px;
         }
     </style>
 </head>
 <body>
     <div class="app">
+        <!-- Header -->
         <header class="header">
-            <h1>Split</h1>
-            <p>Modern expense splitting made simple</p>
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                </div>
+                <h1 class="logo-text">Split</h1>
+            </div>
+            <p class="tagline">Professional expense splitting for modern teams and friends</p>
         </header>
 
-        <!-- People Section -->
-        <div class="card glass-effect">
-            <h2 class="section-title">People</h2>
-            <div class="input-group">
-                <input type="text" id="personName" class="input-flex" placeholder="Add person..." onkeypress="handlePersonKeyPress(event)">
-                <button class="btn" onclick="addPerson()">Add</button>
-            </div>
-            <div class="people-grid" id="peopleGrid"></div>
+        <!-- Currency Selector -->
+        <div class="currency-selector">
+            <label for="currencySelect">Currency:</label>
+            <select id="currencySelect" class="select" onchange="updateCurrency()" style="max-width: 200px;">
+                <option value="JPY">Japanese Yen (¥)</option>
+                <option value="USD">US Dollar ($)</option>
+                <option value="EUR">Euro (€)</option>
+                <option value="GBP">British Pound (£)</option>
+                <option value="CAD">Canadian Dollar (C$)</option>
+                <option value="AUD">Australian Dollar (A$)</option>
+                <option value="CNY">Chinese Yuan (¥)</option>
+                <option value="KRW">South Korean Won (₩)</option>
+                <option value="SGD">Singapore Dollar (S$)</option>
+                <option value="HKD">Hong Kong Dollar (HK$)</option>
+            </select>
         </div>
 
-        <!-- Add Expense Section -->
-        <div class="card glass-effect">
-            <h2 class="section-title">Add Expense</h2>
-            <div class="expense-form">
-                <input type="text" id="expenseDescription" placeholder="What's this for?" class="input-flex">
-                <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" class="input-flex">
-                <select id="expensePaidBy" class="input-flex">
-                    <option value="">Who paid?</option>
-                </select>
-                <button class="btn" onclick="addExpense()">Add</button>
+        <!-- People Management -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                    People
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <div class="form-row form-row-2">
+                        <input type="text" id="personName" class="input" placeholder="Enter person's name..." onkeypress="handlePersonKeyPress(event)" aria-label="Person name">
+                        <button class="btn btn-primary" onclick="addPerson()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Add Person
+                        </button>
+                    </div>
+                </div>
+                <div class="people-grid" id="peopleGrid"></div>
+            </div>
+        </div>
+
+        <!-- Add Expense -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add Expense
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="form-row form-row-4">
+                    <div>
+                        <label class="label" for="expenseDescription">Description</label>
+                        <input type="text" id="expenseDescription" class="input" placeholder="What's this expense for?">
+                    </div>
+                    <div>
+                        <label class="label" for="expenseAmount">Amount</label>
+                        <input type="number" id="expenseAmount" class="input" placeholder="0" step="0.01" min="0">
+                    </div>
+                    <div>
+                        <label class="label" for="expensePaidBy">Paid By</label>
+                        <select id="expensePaidBy" class="select">
+                            <option value="">Select person</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: end;">
+                        <button class="btn btn-primary" onclick="addExpense()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Add Expense
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Expenses List -->
-        <div class="card glass-effect">
-            <h2 class="section-title">Expenses</h2>
-            <div id="expensesContainer">
-                <div class="empty-state" id="emptyExpenses">
-                    No expenses yet. Add your first expense above.
-                </div>
-                <table class="expense-table" id="expenseTable" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Paid by</th>
-                            <th>Date</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="expenseTableBody"></tbody>
-                </table>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Expenses
+                </h2>
             </div>
-        </div>
-
-        <!-- Summary Section -->
-        <div class="card glass-effect" id="summarySection" style="display: none;">
-            <h2 class="section-title">Summary</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-title">Total Expenses</div>
-                    <div class="stat-value" id="totalAmount">$0.00</div>
-                    <div class="stat-subtitle">Split between <span id="peopleCount">0</span> people</div>
-                    <div class="stat-subtitle">$<span id="perPersonAmount">0.00</span> per person</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">Settlement</div>
-                    <div class="balance-list" id="balanceList"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Export Section -->
-        <div class="card glass-effect" id="exportSection" style="display: none;">
-            <h2 class="section-title">Save & Load</h2>
-            <div class="export-section">
-                <button class="btn" onclick="exportToCSV()">Download CSV</button>
-                <button class="btn btn-secondary" onclick="exportToJSON()">Save Trip Data</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Load Trip Data</button>
-                <input type="file" id="fileInput" class="file-input" accept=".json" onchange="importFromJSON(event)">
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let people = [];
-        let expenses = [];
-
-        function handlePersonKeyPress(event) {
-            if (event.key === 'Enter') {
-                addPerson();
-            }
-        }
-
-        function addPerson() {
-            const input = document.getElementById('personName');
-            const name = input.value.trim();
-            
-            if (name && !people.includes(name)) {
-                people.push(name);
-                input.value = '';
-                updateUI();
-            }
-        }
-
-        function removePerson(name) {
-            people = people.filter(person => person !== name);
-            expenses = expenses.filter(expense => expense.paidBy !== name);
-            updateUI();
-        }
-
-        function addExpense() {
-            const description = document.getElementById('expenseDescription').value.trim();
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            const paidBy = document.getElementById('expensePaidBy').value;
-
-            if (description && amount > 0 && paidBy) {
-                expenses.push({
-                    id: Date.now(),
-                    description,
-                    amount,
-                    paidBy,
-                    date: new Date().toLocaleDateString()
-                });
-
-                // Clear form
-                document.getElementById('expenseDescription').value = '';
-                document.getElementById('expenseAmount').value = '';
-                document.getElementById('expensePaidBy').value = '';
-
-                updateUI();
-            }
-        }
-
-        function deleteExpense(id) {
-            expenses = expenses.filter(expense => expense.id !== id);
-            updateUI();
-        }
-
-        function updateUI() {
-            updatePeopleGrid();
-            updateExpensePaidBySelect();
-            updateExpenseTable();
-            updateSummary();
-            updateExportSection();
-        }
-
-        function updatePeopleGrid() {
-            const grid = document.getElementById('peopleGrid');
-            grid.innerHTML = people.map(person => `
-                <div class="person-card fade-in">
-                    <div class="person-name">${person}</div>
-                    <button class="remove-btn" onclick="removePerson('${person}')">Remove</button>
-                </div>
-            `).join('');
-        }
-
-        function updateExpensePaidBySelect() {
-            const select = document.getElementById('expensePaidBy');
-            select.innerHTML = '<option value="">Who paid?</option>' + 
-                people.map(person => `<option value="${person}">${person}</option>`).join('');
-        }
-
-        function updateExpenseTable() {
-            const table = document.getElementById('expenseTable');
-            const tbody = document.getElementById('expenseTableBody');
-            const empty = document.getElementById('emptyExpenses');
-
-            if (expenses.length === 0) {
-                table.style.display = 'none';
-                empty.style.display = 'block';
-                return;
-            }
-
-            table.style.display = 'table';
-            empty.style.display = 'none';
-
-            tbody.innerHTML = expenses.map(expense => `
-                <tr class="fade-in">
-                    <td>${expense.description}</td>
-                    <td>$${expense.amount.toFixed(2)}</td>
-                    <td>${expense.paidBy}</td>
-                    <td>${expense.date}</td>
-                    <td>
-                        <button class="btn-danger" onclick="deleteExpense(${expense.id})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updateSummary() {
-            const section = document.getElementById('summarySection');
-            
-            if (people.length === 0 || expenses.length === 0) {
-                section.style.display = 'none';
-                return;
-            }
-
-            section.style.display = 'block';
-
-            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const perPerson = total / people.length;
-
-            document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
-            document.getElementById('peopleCount').textContent = people.length;
-            document.getElementById('perPersonAmount').textContent = perPerson.toFixed(2);
-
-            // Calculate balances
-            const balances = {};
-            people.forEach(person => {
-                const paid = expenses
-                    .filter(e => e.paidBy === person)
-                    .reduce((sum, e) => sum + e.amount, 0);
-                balances[person] = paid - perPerson;
-            });
-
-            const balanceList = document.getElementById('balanceList');
-            balanceList.innerHTML = people.map(person => {
-                const balance = balances[person];
-                const balanceClass = balance > 0.01 ? 'balance-positive' : 
-                                   balance < -0.01 ? 'balance-negative' : 'balance-neutral';
-                const balanceText = Math.abs(balance) < 0.01 ? 'Settled' :
-                                   balance > 0 ? `Gets $${balance.toFixed(2)}` :
-                                   `Owes $${Math.abs(balance).toFixed(2)}`;
-
-                return `
-                    <div class="balance-item fade-in">
-                        <div class="balance-name">${person}</div>
-                        <div class="balance-amount ${balanceClass}">${balanceText}</div>
+            <div class="card-body">
+                <div id="expensesContainer">
+                    <div class="empty-state" id="emptyExpenses">
+                        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <div class="empty-title">No expenses yet</div>
+                        <div class="empty-description">Add your first expense above to get started</div>
                     </div>
-                `;
-            }).join('');
-        }
+                    <div class="table-container" id="expenseTableContainer" style="display: none;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Paid By</th>
+                                    <th>Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenseTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        function updateExportSection() {
-            const section = document.getElementById('exportSection');
-            section.style.display = (expenses.length > 0) ? 'block' : 'none';
-        }
+        <!-- Summary -->
+        <div class="card" id="summarySection" style="display: none;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Summary & Settlement
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                            <div class="stat-title">Total Expenses</div>
+                        </div>
+                        <div class="stat-value" id="totalAmount">¥0</div>
+                        <div class="stat-subtitle">
+                            Split between <span id="peopleCount">0</span> people<br>
+                            <span id="perPersonAmount">¥0</span> per person
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+                            </svg>
+                            <div class="stat-title">Settlement</div>
+                        </div>
+                        <div class="balance-list" id="balanceList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        function exportToCSV() {
-            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const perPerson = people.length > 0 ? total / people.length : 0;
-
-            // Calculate individual balances
-            const balances = {};
-            people.forEach(person => {
-                const paid = expenses
-                    .filter(e => e.paidBy === person)
-                    .reduce((sum, e) => sum + e.amount, 0);
-                balances[person] = paid - perPerson;
-            });
-
-            let csv = 'EXPENSE SUMMARY\n\n';
-            csv += `Total Expenses,$${total.toFixed(2)}\n`;
-            csv += `People Count,${people.length}\n`;
-            csv += `Per Person,$${perPerson.toFixed(2)}\n\n`;
-
-            csv += 'INDIVIDUAL EXPENSES\n';
-            csv += 'Description,Amount,Paid By,Date\n';
-            expenses.forEach(expense => {
-                csv += `"${expense.description}",${expense.amount.toFixed(2)},"${expense.paidBy}","${expense.date}"\n`;
-            });
-
-            csv += '\nSETTLEMENT DETAILS\n';
-            csv += 'Person,Amount Paid,Amount Owed,Balance,Status\n';
-            people.forEach(person => {
-                const paid = expenses
-                    .filter(e => e.paidBy === person)
-                    .reduce((sum, e) => sum + e.amount, 0);
-                const balance = balances[person];
-                const status = Math.abs(balance) < 0.01 ? 'Settled' :
-                              balance > 0 ? `Gets Back $${balance.toFixed(2)}` :
-                              `Owes $${Math.abs(balance).toFixed(2)}`;
-                
-                csv += `"${person}",${paid.toFixed(2)},${perPerson.toFixed(2)},${balance.toFixed(2)},"${status}"\n`;
-            });
-
-            downloadFile(csv, 'expense-report.csv', 'text/csv');
-        }
-
-        function exportToJSON() {
-            const data = {
-                people: people,
-                expenses: expenses,
-                exportDate: new Date().toISOString(),
-                summary: {
-                    total: expenses.reduce((sum, expense) => sum + expense.amount, 0),
-                    perPerson: people.length > 0 ? expenses.reduce((sum, expense) => sum + expense.amount, 0) / people.length : 0
-                }
-            };
-
-            const json = JSON.stringify(data, null, 2);
-            downloadFile(json, 'trip-expenses.json', 'application/json');
-        }
-
-        function importFromJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.people && data.expenses) {
-                        people = data.people;
-                        expenses = data.expenses;
-                        updateUI();
-                        
-                        // Reset file input
-                        event.target.value = '';
-                        
-                        // Show success message (you could add a toast notification here)
-                        console.log('Trip data loaded successfully!');
-                    } else {
-                        alert('Invalid file format. Please select a valid trip data file.');
-                    }
-                } catch (error) {
-                    alert('Error reading file. Please make sure it\'s a valid JSON file.');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function downloadFile(content, filename, contentType) {
-            const blob = new Blob([content], { type: contentType });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-        // Initialize
-        updateUI();
-    </script>
-</body>
-</html>
+        <!-- Export & Save -->
+        <div class="card" id="exportSection" style="display: none;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Save & Export
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="export-actions">
+                    <button class="btn btn-primary" onclick="exportToCSV()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M4 7h16"></path>
+                        </svg>
+                        Download CSV Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportToJSON()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24
